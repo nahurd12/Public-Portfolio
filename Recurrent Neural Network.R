@@ -44,10 +44,7 @@ yelp <- yelp %>%
 combined_data <- rbind(yelp, amazon)
 combined_data <- rbind(combined_data, imdb)
 
-# Part II: Data Preparation 
-# Part B
-
-# B.1.a 
+# Data Preparation 
 
 summary(combined_data)
 sum(duplicated(combined_data)) 
@@ -75,7 +72,6 @@ head(combined_data$review)
 row_with_emojis <- grepl("[\U{1F600}-\U{1F64F}\U{2702}-\U{27B0}\U{1F680}-\U{1F6C0}\U{1F170}-\U{1F251}\U{1F004}\U{1F0CF}\U{1F004}\U{1F004}]", combined_data$review, perl = TRUE)
 sum(row_with_emojis)
 
-# B.1.b
 # Vocab size
 # Character/word count
 combined_data$review %>%
@@ -91,7 +87,6 @@ vocab_size <- tidy_combined_data %>%
   nrow()
 cat("Vocabulary Size:", vocab_size)
 
-# B.1.c 
 # Sentence Lengths
 sent_length <- sapply(strsplit(combined_data$review, "\\s+"), length)
 summary(sent_length)
@@ -105,7 +100,7 @@ cat("Estimated Embedding Length:", max_seq_embed,
     "\nMedian Sequence Length:", med_seq_length, 
     "\nMinimum Sequence Length:", min_seq_length)
 
-# B.1.d   Statistical justification for chosen max seq length 
+# Statistical justification for chosen max seq length 
 # Create histogram
 hist(sent_length, 
      main = "Histogram of Sentence Lengths", 
@@ -114,7 +109,7 @@ hist(sent_length,
      col = "skyblue",
      border = "black")
 
-# B2 - Tokenization 
+# Tokenization 
 tidy_combined_data <- combined_data %>% # EXECUTED ABOVE IN B1b
   unnest_tokens(word, review)
 
@@ -128,15 +123,15 @@ tokenizer <- text_tokenizer()
 tokenizer$fit_on_texts(tidy_combined_data$word)
 word_indicies <- tokenizer$texts_to_sequences(tidy_combined_data$word)
 
-# B.3.a - Padding Process 
+# Padding Process 
 padded_seq <- pad_sequences(word_indicies, maxlen = max_seq_length, padding = "post", truncating = "post")
 
-# B.3.b - Single padded sequence 
+# Single padded sequence 
 single_pad_seq_index <- 8
 single_pad_seq <- padded_seq[single_pad_seq_index,]
 single_pad_seq
 
-# B.4 - How many categories of sentiment and activation function 
+# How many categories of sentiment and activation function 
 
 text_vectorization <- layer_text_vectorization(
   max_tokens = vocab_size, 
@@ -160,35 +155,26 @@ output <- input_layer %>%
 # Split data 
 set.seed(123)
 
-  # Define proportions for train, validation, and test sets
+# Define proportions for train, validation, and test sets
 train_split <- 0.6
 validation_split <- 0.2
 test_split <- 0.2
 
-  # Determine the number of samples for each split
+# Determine the number of samples for each split
 num_samples <- nrow(tidy_combined_data)
 num_train <- round(train_split * num_samples)
 num_validation <- round(validation_split * num_samples)
 num_test <- num_samples - num_train - num_validation
 
-  # Split the data into train, validation, and test sets
+# Split the data into train, validation, and test sets
 train_data <- tidy_combined_data[1:num_train, ]
 validation_data <- tidy_combined_data[(num_train + 1):(num_train + num_validation), ]
 test_data <- tidy_combined_data[(num_train + num_validation + 1):(num_train + num_validation + num_test), ]
 
-# B.6 - Copy of prepared data set
-# B6 ************************* CHANGE TEST AND TRAIN TO TEST_DATA OR WHATEVER *******************
-# Export the data 
-# write.csv(train, "C:\\Users\\nahur\\Desktop\\WGU\D213 Advanced Data Analytics\\Task 2\\D213_train.csv", row.names=FALSE)
-# write.csv(test, "C:\\Users\\nahur\\Desktop\\WGU\D213 Advanced Data Analytics\\Task 2\\D213_test.csv", row.names=FALSE)
-
-# Part III: Network Architecture 
-
-# C.1 
+# Network Architecture 
 model <- keras_model(input_layer, output)
 summary(model)
 
-# C.2
 model %>% compile(
   loss = "binary_crossentropy",
   optimizer = "adam",
@@ -254,8 +240,10 @@ metrics_df <- data.frame(
   loss = loss,
   val_loss = val_loss
 )
+
 # Melt the data frame for easier plotting
 metrics_df <- melt(metrics_df, id.vars = "epoch")
+
 # Plot accuracy & loss
 accuracy_plot <- ggplot(metrics_df, aes(x = epoch, y = value, color = variable)) +
   geom_line() +
