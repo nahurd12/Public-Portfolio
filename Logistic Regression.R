@@ -85,7 +85,7 @@ summary(mdata$TotalCharge)
 summary(mdata$Gender)
 summary(mdata$Services)
 
-# Part 3 - 3 Univariate and Bivariate Analysis 
+# Univariate and Bivariate Analysis 
 
 # Age 
 hist(mdata$Age, main = "Age of Patients")
@@ -202,8 +202,6 @@ ggplot(mdata, aes(x = Services, fill = factor(Anxiety))) +
 # Anxiety vs TotalCharge
 boxplot(mdata$TotalCharge ~ mdata$Anxiety, xlab = "Anxiety", ylab = "TotalCharge", names = no_yes_label, main = "Anxiety vs TotalCharge")
 
-#################### 
-
 # Logistic Regression 
 
 initial_model <- glm(Anxiety ~ Age + Gender + VitD_levels + HighBlood + Stroke + Arthritis + Diabetes + Asthma + Services + TotalCharge, data = mdata, family = "binomial")
@@ -225,7 +223,6 @@ plot(reduced_model)
 # Confidence Interval of reduced model 
 confint(reduced_model)
 
-###################
 # Confusion Matrix 
 
 split <- sample.split(mdata$Anxiety, SplitRatio = 0.8)
@@ -242,4 +239,3 @@ range(result) # Range of probabilities
 
 table(test$Anxiety, result > 0.31)
 
-write.csv(mdata, "C:\\Users\\nahur\\Desktop\\WGU\\D208 Predictive Modeling\\D208Task2.csv", row.names=FALSE)
